@@ -1,0 +1,1 @@
+# wad_lecture_django_task
