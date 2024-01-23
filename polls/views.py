@@ -3,18 +3,20 @@ from django.http import HttpResponse, HttpResponseRedirect
 from .models import Question, Choice
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
+from django.utils import timezone
+
 
 # Create your views here.
 
 def index(request):
-    latest_questions = Question.objects.order_by("-pub_date")[:3]
+    latest_questions = Question.objects.filter(pub_date__lte=timezone.now()).order_by("-pub_date")[:3]
 
     context = {'latest_question_list': latest_questions}
 
     return render(request, 'polls/index.html',context)
 
 def detail(request, question_id):
-    question = get_object_or_404(Question, pk=question_id)
+    question = get_object_or_404(Question.objects.filter(pub_date__lte=timezone.now()), pk=question_id)
     return render(request, 'polls/detail.html',{'question':question})
     
 def results(request, question_id):
@@ -31,4 +33,4 @@ def vote(request, question_id):
        selected_choice.votes += 1
        selected_choice.save()
 
-    return HttpResponseRedirect(reverse('polls:results',args=(question.id,)))    
+    return HttpResponseRedirect(reverse('polls:results',args=(question.id,)))
